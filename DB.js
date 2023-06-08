@@ -4,7 +4,10 @@ let connection = mysql.createConnection({
     host     : '127.0.0.1', //실제로 연결할 데이터베이스의 위치
     user     : 'partshop',
     password : 'tech7975',
-    database : 'partshop' //데이터베이스 이름
+    database : 'partshop', //데이터베이스 이름
+    connectionLimit: 500,
+  waitForConnections: true,
+  dateStrings: 'date'
   });
   
   

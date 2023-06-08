@@ -133,39 +133,38 @@ app.get('/api/login', (req, res) => {
 });
 
 // 카테고리 정보 가져오기 
-app.get('/api/category', (req, res) => {
-  db.query('SELECT * FROM productdata', (error, results, fields) => {
- 
-      res.status(200).send(results);
-   
-  })
 
+app.get('/api/category', (req, res) => {
+  db.query( 'SELECT p.*,a.*  FROM productdata a INNER JOIN category p ON a.catenum = p.catenum', (error, results, fields) => {
+      res.status(200).send(results);
+  })
+})
+// 메인 페스만 가져오기
+app.get('/api/Maincategory', (req, res) => {
+  db.query( 'SELECT *  FROM category', (error, results, fields) => {
+      res.status(200).send(results);
+  })
 })
 
 // 제품 정보 카테고리 가져오기 
 app.get('/api/product', (req, res) => {
   const st = req.query.sort
-  const path1 = req.query.path1
-  const path2 = req.query.path2
+  const path = req.query.path
   if(st == 'inch'){
-  db.query('SELECT DISTINCT inch FROM productlist WHERE category = ? OR subcategory = ?',[path1,path2], (error, results, fields) => {
+    db.query('SELECT DISTINCT pl.inch FROM productlist AS pl JOIN category AS c ON c.catenum = pl.catenum  JOIN productdata AS pd ON pd.subcatenum = pl.subcatenum WHERE pd.subcategory = ?  OR c.category = ?', [path,path], (error, results, fields) => {
       res.status(200).send(results);
-   
   })
 }else if(st == 'brand'){
-  db.query('SELECT DISTINCT brand FROM productlist WHERE category = ? OR subcategory = ?',[path1,path2], (error, results, fields) => {
+  db.query('SELECT DISTINCT pl.brand FROM productlist AS pl JOIN category AS c ON c.catenum = pl.catenum  JOIN productdata AS pd ON pd.subcatenum = pl.subcatenum WHERE pd.subcategory = ?  OR c.category = ?', [path,path], (error, results, fields) => {
     res.status(200).send(results);
- 
 })
 }else if(st == 'material'){
-  db.query('SELECT DISTINCT material FROM productlist WHERE category = ? OR subcategory = ?',[path1,path2], (error, results, fields) => {
+  db.query('SELECT DISTINCT pl.material FROM productlist AS pl JOIN category AS c ON c.catenum = pl.catenum  JOIN productdata AS pd ON pd.subcatenum = pl.subcatenum WHERE pd.subcategory = ?  OR c.category = ?', [path,path], (error, results, fields) => {
     res.status(200).send(results);
- 
 })
 }else if(st == 'color'){
-  db.query('SELECT DISTINCT color FROM productlist WHERE category = ? OR subcategory = ?',[path1,path2], (error, results, fields) => {
+  db.query('SELECT DISTINCT pl.color FROM productlist AS pl JOIN category AS c ON c.catenum = pl.catenum  JOIN productdata AS pd ON pd.subcatenum = pl.subcatenumWHERE pd.subcategory = ?  OR c.category = ?', [path,path], (error, results, fields) => {
     res.status(200).send(results);
- 
 })
 }
 
@@ -173,22 +172,24 @@ app.get('/api/product', (req, res) => {
 
 // 제품 정보 목록 가져오기 
 // 1path 기준 
-app.get('/api/mainproduct', (req, res) => {
-  db.query('SELECT * FROM productlist WHERE category = ?',[req.query.cate], (error, results, fields) => {
-    res.status(200).send(results);
- 
-})
+app.get('/api/getproduct', (req, res) => {
+  const other = req.query.none
+  if(other) {
+    db.query('SELECT pl.*,c.category,pd.subcategory FROM iotlist AS pl JOIN category AS c ON  pl.catenum = c.catenum  JOIN productdata AS pd ON pd.subcatenum = pl.subcatenum  WHERE c.category = ? or pd.subcategory = ?',[req.query.cate,req.query.cate], (error, results, fields) => {
+      res.status(200).send(results);
+  
+  })
+  }else{
+    db.query('SELECT pl.*,c.category,pd.subcategory FROM  productlist AS pl JOIN category AS c ON  pl.catenum = c.catenum  JOIN productdata AS pd ON pd.subcatenum = pl.subcatenum  WHERE c.category = ? or pd.subcategory = ?',[req.query.cate,req.query.cate], (error, results, fields) => {
+      res.status(200).send(results);
+  })
+  }
+
 
 })
+;
 
-//2path 기준
-app.get('/api/subproduct', (req, res) => {
-  db.query('SELECT * FROM productlist WHERE subcategory = ?',[req.query.subcate], (error, results, fields) => {
-    res.status(200).send(results);
- 
-})
 
-})
 
 //상세
 app.get('/api/productdetail', (req, res) => {
@@ -198,10 +199,19 @@ app.get('/api/productdetail', (req, res) => {
 })
 
 })
-
 // 전체 
+
 app.get('/api/Allproductdetail', (req, res) => {
-  db.query('SELECT * FROM productlist', (error, results, fields) => {
+  db.query('SELECT pl.*,c.category,pd.subcategory FROM  productlist AS pl JOIN category AS c ON  pl.catenum = c.catenum  JOIN productdata AS pd ON pd.subcatenum = pl.subcatenum ', (error, results, fields) => {
+    res.status(200).send(results);
+
+})
+
+})
+// 전체 
+
+app.get('/api/Alliotlist', (req, res) => {
+  db.query('SELECT pl.*,c.category,pd.subcategory FROM  iotlist AS pl JOIN category AS c ON  pl.catenum = c.catenum  JOIN productdata AS pd ON pd.subcatenum = pl.subcatenum ORDER BY updatetime DESC LIMIT 5', (error, results, fields) => {
     res.status(200).send(results);
 
 })
@@ -232,13 +242,12 @@ app.post('/api/images', upload.single('img'), (req, res) => {
   // 업로드된 이미지의 URL 경로를 프론트엔드로 반환한다.
   console.log('전달받은 파일', req.file);
   console.log('저장된 파일의 이름', req.file.filename);
- 
-
   // 파일이 저장된 경로를 클라이언트에게 반환해준다.
   const IMG_URL = `http://localhost:5000/uploads/${req.file.filename}`;
   console.log(IMG_URL);
   res.json({ url: IMG_URL });
 });
+
 
 app.get('/api/updatename', (req, res) => {
 
@@ -288,19 +297,25 @@ const uploadThumb = multer({
     },
   }),
 });
+const fileUpload = multer({
+  storage: multer.diskStorage({
+    destination(req, file, cb) {
+      cb(null, 'public/file_uploads');
+    },
+    filename(req, file, cb) {
+      const ext = path.extname(file.originalname);
+      const decodedFileName = decodeURIComponent(file.originalname);
+      cb(null, path.basename(decodedFileName, ext) + Date.now() + ext);
+    },
+  }),
+});
 
 
 app.get('/api/uploadproduct', (req, res) => {
-  
-  db.query('INSERT INTO uploadproduct(title,content) VALUES (?,?) ', [req.query.title,req.query.content], (error, results, fields) => {
-    if (error) {
-      console.error(error);
-      res.status(500).send(false);
-      return;
-    }
-
-  })
-    db.query('INSERT INTO productlist( category,subcategory,pName,pquantity,pPrice,inch,material,brand,color) VALUES (?,?,?,?,?,?,?,?,?) ', [ req.query.category,req.query.subcategory,req.query.pName,req.query.pquantity,req.query.pPrice,req.query.inch,req.query.material,req.query.brand,req.query.color], (error, results, fields) => {
+  console.log(req.query.catenum,'catenum')
+ const cost =  Number(req.query.pPrice) * (100 - req.query.dcrate)/100 
+ if(req.query.catenum !== '3'){
+    db.query('INSERT INTO productlist( title,content,catenum,subcatenum,pName,pquantity,pCost,inch,material,brand,color,dcrate,moq,prepare,pDetail,pPrice) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ', [req.query.title,req.query.content,req.query.catenum,req.query.subcatenum,req.query.pName,req.query.pquantity,req.query.pPrice,req.query.inch,req.query.material,req.query.brand,req.query.color,req.query.dcrate,req.query.moq,req.query.prepare,req.query.detail,cost], (error, results, fields) => {
       if (error) {
         console.error(error);
         res.status(500).send(false);
@@ -309,13 +324,24 @@ app.get('/api/uploadproduct', (req, res) => {
 
       res.status(200).send(true);
     });
+  }else{
+    db.query('INSERT INTO iotlist( title,content,catenum,subcatenum,pName,brand,pDetail) VALUES (?,?,?,?,?,?,?) ', [ req.query.title,req.query.content, req.query.catenum,req.query.subcatenum,req.query.pName,req.query.brand,req.query.detail], (error, results, fields) => {
+      if (error) {
+        console.error(error);
+        res.status(500).send(false);
+        return;
+      }
+      res.status(200).send(true);
+    });
+  }
     
   });
 
 
 
-app.post('/api/imagethumb', uploadThumb.array('images', 5), (req, res) => {
+app.post('/api/imagethumb', uploadThumb.array('images', 6), (req, res) => {
   console.log(uploadThumb,'?')
+  console.log(req.files)
   const IMG_URLs = req.files.map(file => `http://localhost:5000/thumb_uploads/${file.filename}`);
   console.log(IMG_URLs, 'urlrulrulrul');
 
@@ -326,9 +352,53 @@ app.post('/api/imagethumb', uploadThumb.array('images', 5), (req, res) => {
     } else {
       const lastInsertId = results[0].id;
       console.log(lastInsertId,'lastInsertId')
-      const sql = `UPDATE productlist SET img1 = ?, img2 = ?, img3 = ?, img4 = ? WHERE id = ?`;
+      const sql = `UPDATE productlist SET img1 = ?, img2 = ?, img3 = ?, img4 = ?, img5 = ?  WHERE id = ?`;
   
-      const values = [IMG_URLs[0], IMG_URLs[1], IMG_URLs[2], IMG_URLs[3],lastInsertId];
+      const values = [IMG_URLs[0], IMG_URLs[1], IMG_URLs[2], IMG_URLs[3],IMG_URLs[4], lastInsertId];
+      db.query(sql, values, (error, results) => {
+        if (error) {
+          console.error(error);
+        }
+      });
+    }
+  });
+});
+app.post('/api/imagethumbs', uploadThumb.array('images', 6), (req, res) => {
+  const IMG_URLs = req.files.map(file => `http://localhost:5000/thumb_uploads/${file.filename}`);
+  res.json({ urls: IMG_URLs });
+  db.query("SELECT LAST_INSERT_ID() as id", (error, results) => {
+    if (error) {
+      console.error(error);
+    } else {
+      const lastInsertId = results[0].id;
+      console.log(lastInsertId,'lastInsertId')
+      const sql = `UPDATE iotlist SET thumb = ? WHERE id = ?`;
+      const values = [IMG_URLs[0],lastInsertId];
+      db.query(sql, values, (error, results) => {
+        if (error) {
+          console.error(error);
+        }
+      });
+    }
+  });
+});
+
+
+app.post('/api/fileboard', fileUpload.array('files'), (req, res) => {
+
+  const IMG_URLs = req.files.map(file => `http://localhost:5000/file_uploads/${file.filename}`);
+  console.log(IMG_URLs, 'urlrulrulrul');
+
+  res.json({ urls: IMG_URLs });
+  db.query("SELECT LAST_INSERT_ID() as id", (error, results) => {
+    if (error) {
+      console.error(error);
+    } else {
+      const lastInsertId = results[0].id;
+      console.log(lastInsertId,'lastInsertId')
+      const sql = `UPDATE iotlist SET file1 = ?, file2 = ?, file3 = ?, file4 = ? WHERE id = ?`;
+      const values = [IMG_URLs[0], IMG_URLs[1], IMG_URLs[2], IMG_URLs[3], lastInsertId];
+      console.log(values,'v')
       db.query(sql, values, (error, results) => {
         if (error) {
           console.error(error);
@@ -340,26 +410,6 @@ app.post('/api/imagethumb', uploadThumb.array('images', 5), (req, res) => {
 
 
 
-// 게시글 가져오기
-app.get('/api/Alluploadlist', (req, res) => {
-
-  db.query('SELECT * FROM uploadproduct',(error, results, fields) => {
-  
-    res.status(200).send(results);
-  })
-
-});
-
-// 특정 게시글 가져오기 
-// 게시글 가져오기
-app.get('/api/uploadlist', (req, res) => {
-
-  db.query('SELECT * FROM uploadproduct WHERE id = ?',[req.query.id],(error, results, fields) => {
-  
-    res.status(200).send(results);
-  })
-
-});
 
 
 // 카트추가
@@ -373,7 +423,7 @@ app.get('/api/addCart', (req, res) => {
     data.forEach((item) => {
       db.query(query, [item.id, userId, item.count], (error, results, fields) => {
         if (error) throw error;
-        console.log('성공!')
+        
       });
     });
 
@@ -405,7 +455,7 @@ app.get('/api/getCart', (req, res) => {
 
 // 카트삭제하기(하나씩)
 app.get('/api/deleteCart', (req, res) => {
-if(req.query.num.length>1){
+if(Array.isArray(req.query.num) && req.query.num.length>1){
   const ids = req.query.num; 
 const idList = ids.join(',');
 const query = `DELETE FROM addcart WHERE productnum IN (${idList});`
@@ -413,7 +463,8 @@ const query = `DELETE FROM addcart WHERE productnum IN (${idList});`
     console.log(req.query.num)
     res.status(200).send(true)
   })
-}else{
+}
+else{
   db.query('DELETE FROM addcart WHERE productnum = ?',[req.query.num],(error, results, fields) => {
     console.log(req.query.num)
     res.status(200).send(true)
@@ -432,7 +483,7 @@ app.get('/api/addNeeds', (req, res) => {
     data.forEach((item) => {
       db.query(query, [item.id, userId, item.count], (error, results, fields) => {
         if (error) throw error;
-        console.log('성공!')
+
       });
     });
     
@@ -451,8 +502,7 @@ app.get('/api/addNeeds', (req, res) => {
 
 
 app.get('/api/getcompare', (req, res) => {
-  const values = req.query.num
-  console.log(req.query.num,'?')
+  const values = (req.query.num[0]&&req.query.num[0].productnum&&req.query.num.map(value => value.productnum))|| req.query.num
   const query = `SELECT * FROM productlist WHERE id IN (${values.map(val => '?').join(',')})`
   db.query(query,values,(error, results, fields) => {
     console.log(req.query.userId)
@@ -479,10 +529,237 @@ app.get('/api/getpass', (req, res) => {
 
 // 추천 상품 가져오기 
 app.get('/api/recommendlist', (req, res) => {
-  db.query('SELECT * FROM productlist WHERE category = ? ORDER BY RAND()LIMIT 5',[req.query.subcate],(error, results, fields) => {
+  db.query('SELECT pl.*,c.category,pd.subcategory FROM productlist AS pl JOIN category AS c ON  pl.catenum = c.catenum JOIN productdata AS pd ON pd.subcatenum = pl.subcatenum WHERE c.category = ? AND pl.id != ? ORDER BY RAND()LIMIT 5',[req.query.subcate,req.query.num],(error, results, fields) => {
   
     res.status(200).send(results);
   })
 
 });
 
+// 카테고리 추가하기
+app.get('/api/addMainCate', (req, res) => {
+const data = req.query.cates; 
+console.log(data,'data')
+console.log('main')
+const query = 'INSERT INTO category(category,catenum) VALUES (?,?) ON DUPLICATE KEY UPDATE category = VALUES(category)'
+data.forEach((item) => {
+  db.query(query, [item.category, item.catenum], (error, results, fields) => {
+    if (error) throw error;
+  });
+});
+res.status(200).send(true);
+  })
+
+
+  
+  // 카테고리 추가하기(sub)
+  app.get('/api/addCates', (req, res) => {
+    const cate = req.query.cate
+    const cates = req.query.cates; 
+    console.log('sub')
+    const query = 'INSERT INTO productdata (catenum, subcategory, subcatenum) VALUES (?,?,?) ON DUPLICATE KEY UPDATE catenum = VALUES(catenum), subcategory = VALUES(subcategory);'
+    const querys = 'INSERT INTO category(category,catenum) VALUES (?,?) ON DUPLICATE KEY UPDATE category = VALUES(category)'
+
+    console.log(cate,'?')
+    if(cate){
+    cate&&cate.forEach((item) => {
+      db.query(query, [item.catenum, item.subcategory,item.subcatenum], (error, results, fields) => {
+        if (error) throw error;
+    
+      });
+    });
+  }
+  if(cates){
+    cates.forEach((item) => {
+    db.query(querys, [item.category, item.catenum], (error, results, fields) => {
+      if (error) throw error;
+  
+    });
+    
+  });
+}
+        res.status(200).send(true);
+      })
+  
+      
+
+// 카테고리 삭제하기(메인)
+app.get('/api/dMainCate', (req, res) => {
+  db.query('DELETE FROM category WHERE catenum = ?',[req.query.num],(error, results, fields) => {
+    console.log(req.query.num,'???')
+  })
+  db.query('DELETE FROM productdata WHERE catenum = ?',[req.query.num],(error, results, fields) => {
+    console.log(req.query.num,'???')
+  })
+  
+  res.status(200).send(true);
+
+});
+
+// 카테고리 삭제하기(서브)
+app.get('/api/dSubCate', (req, res) => {
+  db.query('DELETE FROM productdata WHERE subcatenum = ?',[req.query.num],(error, results, fields) => {
+    console.log(req.query.num,'???')
+    res.status(200).send(true);
+  })
+
+});
+
+// 전체 게시물 가져오기 
+app.get('/api/getAllItem', (req, res) => {
+  const path = req.query.path
+  const sql = path === 'notice' ? 'SELECT * FROM notice' :  path === 'qna' ? 'SELECT * FROM qna' :'SELECT * FROM faq'
+  db.query(sql,(error, results, fields) => {
+    res.status(200).send(results);
+  })
+});
+
+// 공지사항 작성하기
+app.get('/api/writenotice', (req, res) => {
+  db.query('INSERT INTO notice(title,content,writer,category) VALUES (?,?,?,?) ', [req.query.title,req.query.content,req.query.writer,req.query.category], (error, results, fields) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send(false);
+      return;
+    }
+    res.status(200).send(true);
+  })
+});
+// 게시물 수정하기 
+app.get('/api/updateItem', (req, res) => {
+  const path = req.query.path
+  console.log(path,'path')
+  const sql =  path === 'notice' ? 'UPDATE notice SET title =?, content = ?, category = ?  WHERE id = ?' : 'UPDATE qna SET title =?, content = ?, category = ?  WHERE id = ?'
+
+  db.query(sql, [req.query.title,req.query.content,req.query.category,req.query.id], (error, results, fields) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send(false);
+      return;
+    }
+    res.status(200).send(true);
+  })
+});
+
+
+// 특정 게시물 가져오기 
+app.get('/api/getItemcon', (req, res) => {
+  const path = req.query.path
+  const sql = path==='notice' ? 'SELECT * FROM notice WHERE id = ?' : 'SELECT * FROM qna WHERE id = ?'
+  db.query(sql,[req.query.num],(error, results, fields) => {
+    res.status(200).send(results);
+  })
+
+});
+// 게시물 삭제하기
+app.get('/api/dItem', (req, res) => {
+  const path = req.query.path
+  const sql = path ==='notcie' ? 'DELETE FROM notice WHERE id = ?' : path ==='qna' ? 'DELETE FROM qna WHERE id = ?' : 'DELETE FROM faq WHERE id = ?'
+
+  db.query(sql,[req.query.id],(error, results, fields) => {
+    console.log(req.query.num,'???')
+    res.status(200).send(true);
+  })
+
+});
+
+// qna 작성하기
+app.get('/api/writeqna', (req, res) => {
+  db.query('INSERT INTO qna(title,content,writer,category) VALUES (?,?,?,?) ', [req.query.title,req.query.content,req.query.writer,req.query.category], (error, results, fields) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send(false);
+      return;
+    }
+    res.status(200).send(results);
+  })
+});
+// qna 답변 작성하기
+app.get('/api/writeqnaanswer', (req, res) => {
+  db.query('UPDATE qna SET answer=? ,answerwriter=? WHERE id = ? ', [req.query.content,req.query.writer,req.query.num], (error, results, fields) => {
+    console.log(req.query.content)
+    console.log(req.query.num)
+    if (error) {
+      console.error(error);
+      res.status(500).send(false);
+      return;
+    }
+    res.status(200).send(true);
+  })
+});
+
+
+
+
+// faq 작성하기
+app.get('/api/writefaq', (req, res) => {
+  db.query('INSERT INTO faq(title,content,writer,category) VALUES (?,?,?,?) ', [req.query.title,req.query.content,req.query.writer,req.query.category], (error, results, fields) => {
+    console.log(req.query.title)
+    console.log(req.query.content)
+    console.log(req.query.category)
+    if (error) {
+      console.error(error);
+      res.status(500).send(false);
+      return;
+    }
+    res.status(200).send(results);
+  })
+});
+
+
+// 이전 글 가져오기 
+app.get('/api/prevNext', (req, res) => {
+  const num = Number(req.query.num);
+  const id = req.query.id
+  const sql = 
+  id === 'notice' ? 
+  'SELECT * FROM notice WHERE id IN ((SELECT id FROM notice WHERE id < ? ORDER BY id DESC LIMIT 1),(SELECT id FROM notice WHERE id > ? ORDER BY id ASC LIMIT 1))'
+  : 'SELECT * FROM qna WHERE id IN ((SELECT id FROM qna WHERE id < ? ORDER BY id DESC LIMIT 1),(SELECT id FROM qna WHERE id > ? ORDER BY id ASC LIMIT 1))'
+  ;
+  db.query(sql, [num, num], (error, results, fields) => {
+    if (error) {
+      console.error('Error executing SQL query:', error);
+      res.status(500).send('An error occurred');
+      return;
+    }
+    res.status(200).send(results);
+  });
+});
+
+//메인 컨트롤 
+app.get('/api/updatemain', (req, res) => {
+  const a1= req.query.a1;const a2= req.query.a2;const a3= req.query.a3;const a4= req.query.a4;const a5= req.query.a5;const a6= req.query.a6;const a7= req.query.a7;const a8= req.query.a8;const a9= req.query.a9;const a10= req.query.a10
+  const b1= req.query.b1;const b2= req.query.b2;const b3= req.query.b3;const b4= req.query.b4;const b5= req.query.b5;const b6= req.query.b6;const b7= req.query.b7;const b8= req.query.b8;const b9= req.query.b9;const b10= req.query.b10
+
+  db.query('UPDATE maincontrol SET p1=?, p2=?, p3=?, p4=?, p5=?, p6=?, p7=?, p8=?,p9=?,p10=? WHERE main = ?',[a1, a2, a3, a4, a5, a6, a7, a8,a9,a10 ,'mainA'],
+    (error, results, fields) => {
+      if (error) {
+        console.error(error);
+        res.status(500).send(false);
+        return;
+      }
+      db.query(
+        'UPDATE maincontrol SET p1=?, p2=?, p3=?, p4=?, p5=?, p6=?, p7=?, p8=?,p9=?,p10=?  WHERE main = ?',
+        [b1, b2, b3, b4, b5, b6, b7, b8,b9,b10 ,'mainB'],
+        (error, results, fields) => {
+          if (error) {
+            console.error(error);
+            res.status(500).send(false);
+            return;
+          }
+          res.status(200).send(true);
+        }
+      );
+    }
+  );
+})
+
+// 메인 데이터 가져오기
+
+app.get('/api/getmain', (req, res) => {
+  db.query('SELECT * FROM maincontrol', (error, results, fields) => {
+    res.status(200).send(results);
+ 
+})
+
+})
