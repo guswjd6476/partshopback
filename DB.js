@@ -22,20 +22,18 @@ let connection = mysql.createConnection({
     user     : 'root',
     password : 'rkdguswjd!!11',
     database : 'partshop', //데이터베이스 이름
-         connectionLimit: 500,
-   waitForConnections: true,
-   dateStrings: 'date'
-  });
-  
-  
-  
-    module.exports = connection;
+    connectionLimit: 500,
+    waitForConnections: true,
+    dateStrings: 'date'
+});
 
-    connection.connect(function(err) {
-      if (err) {
+connection.connect(function(err) {
+    if (err) {
         console.error('error connecting: ' + err.stack);
         return;
-      }
-    
-      console.log('connected as id ' + connection.threadId);
-    });
+    }
+  
+    console.log('connected as id ' + connection.threadId);
+});
+
+module.exports = connection;
