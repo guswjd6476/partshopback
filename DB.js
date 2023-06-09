@@ -21,11 +21,13 @@ let connection = mysql.createConnection({
     host     : 'svc.sel4.cloudtype.app', //실제로 연결할 데이터베이스의 위치
     user     : 'root',
     password : 'rkdguswjd!!11',
-    database : 'partshop' //데이터베이스 이름
+    database : 'partshop', //데이터베이스 이름
+         connectionLimit: 500,
+   waitForConnections: true,
+   dateStrings: 'date'
   });
   
   
-    // connection.connect();
   
     module.exports = connection;
 
