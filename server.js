@@ -8,7 +8,7 @@ let cors = require('cors'); // 설치시 모든 도메인에서 제한 없이 �
 const bodyParser = require('body-parser');
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
-const port =  5000;
+const port =  'https://port-0-partshopback-lme62alhk7lvdw.sel4.cloudtype.app'||5000;
 const jwt = require("jsonwebtoken");
 // app.use('/vapi', createProxyMiddleware({target:'https://ollehfarm-guswjd6476.koyeb.app',changeOrigin:true}))
 
