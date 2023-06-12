@@ -16,20 +16,20 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
 app.use(express.json());
-let corsOptions = {
-  origin: "*", // 출처 허용 옵션
-  credential: true, // 사용자 인증이 필요한 리소스(쿠키 ..등) 접근
-};
+var corsOptions = {
+    origin: 'https://sub.example.app',
+    // 이 설정은 https://sub.example.app 인 origin을 허용합니다.
+    // 어플리케이션 구성에 맞게 origin 규칙을 적용해주세요.
+    optionsSuccessStatus: 200 
+}
 
-app.use(cors(corsOptions));
-//---(1) express 서버 셋팅 및 subscribe. database save---------------------// 
-app.listen(port, () => {
-    console.log(`listening on ${port}`);
-   
-      
+app.get('/users/:id', cors(corsOptions), function (req, res, next) {
+    res.json({msg: 'https://sub.example.app 규칙인 Origin에 대하여 개방'})
+})
 
-
-});
+app.listen(5000, function () {
+    console.log('80번 포트로 서비스 하는 웹서버에 CORS 적용')
+})
 
 // 쿼리문에 사용되는 변수 
 
