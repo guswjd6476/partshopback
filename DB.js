@@ -18,7 +18,7 @@
 
 const mysql = require("mysql");
 let connection = mysql.createConnection({
-    host     : 'svc.sel4.cloudtype.app:30802', //실제로 연결할 데이터베이스의 위치
+    host     : '127.0.0.1', //실제로 연결할 데이터베이스의 위치
     user     : 'root',
     password : 'rkdguswjd!!11',
     database : 'partshop', //데이터베이스 이름
