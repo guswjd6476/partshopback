@@ -1,39 +1,39 @@
 
-const mysql = require("mysql");
-let connection = mysql.createConnection({
-    host     : '127.0.0.1', //실제로 연결할 데이터베이스의 위치
-    user     : 'partshop',
-    password : 'tech7975',
-    database : 'partshop', //데이터베이스 이름
-    connectionLimit: 500,
-  waitForConnections: true,
-  dateStrings: 'date'
-  });
-  
-  
-    connection.connect();
-  
-    module.exports = connection;
-
-
 // const mysql = require("mysql");
 // let connection = mysql.createConnection({
-//     host     : 'mariadb', //실제로 연결할 데이터베이스의 위치
-//     user     : 'root',
-//     password : 'rkdguswjd!!11',
+//     host     : '127.0.0.1', //실제로 연결할 데이터베이스의 위치
+//     user     : 'partshop',
+//     password : 'tech7975',
 //     database : 'partshop', //데이터베이스 이름
 //     connectionLimit: 500,
-//     waitForConnections: true,
-//     dateStrings: 'date'
-// });
-
-// connection.connect(function(err) {
-//     if (err) {
-//         console.error('error connecting: ' + err.stack);
-//         return;
-//     }
+//   waitForConnections: true,
+//   dateStrings: 'date'
+//   });
   
-//     console.log('connected as id ' + connection.threadId);
-// });
+  
+//     connection.connect();
+  
+//     module.exports = connection;
 
-// module.exports = connection;
+
+const mysql = require("mysql");
+let connection = mysql.createConnection({
+    host     : 'mariadb', //실제로 연결할 데이터베이스의 위치
+    user     : 'root',
+    password : 'rkdguswjd!!11',
+    database : 'partshop', //데이터베이스 이름
+    connectionLimit: 500,
+    waitForConnections: true,
+    dateStrings: 'date'
+});
+
+connection.connect(function(err) {
+    if (err) {
+        console.error('error connecting: ' + err.stack);
+        return;
+    }
+  
+    console.log('connected as id ' + connection.threadId);
+});
+
+module.exports = connection;
