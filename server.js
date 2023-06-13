@@ -243,7 +243,7 @@ app.post('/api/images', upload.single('img'), (req, res) => {
   console.log('전달받은 파일', req.file);
   console.log('저장된 파일의 이름', req.file.filename);
   // 파일이 저장된 경로를 클라이언트에게 반환해준다.
-  const IMG_URL = `http://localhost:5000/uploads/${req.file.filename}`;
+  const IMG_URL = `https://port-0-partshopback-lme62alhk7lvdw.sel4.cloudtype.app/uploads/${req.file.filename}`;
   console.log(IMG_URL);
   res.json({ url: IMG_URL });
 });
@@ -342,7 +342,7 @@ app.get('/api/uploadproduct', (req, res) => {
 app.post('/api/imagethumb', uploadThumb.array('images', 6), (req, res) => {
   console.log(uploadThumb,'?')
   console.log(req.files)
-  const IMG_URLs = req.files.map(file => `http://localhost:5000/thumb_uploads/${file.filename}`);
+  const IMG_URLs = req.files.map(file => `https://port-0-partshopback-lme62alhk7lvdw.sel4.cloudtype.app/thumb_uploads/${file.filename}`);
   console.log(IMG_URLs, 'urlrulrulrul');
 
   res.json({ urls: IMG_URLs });
@@ -364,7 +364,7 @@ app.post('/api/imagethumb', uploadThumb.array('images', 6), (req, res) => {
   });
 });
 app.post('/api/imagethumbs', uploadThumb.array('images', 6), (req, res) => {
-  const IMG_URLs = req.files.map(file => `http://localhost:5000/thumb_uploads/${file.filename}`);
+  const IMG_URLs = req.files.map(file => `https://port-0-partshopback-lme62alhk7lvdw.sel4.cloudtype.app/thumb_uploads/${file.filename}`);
   res.json({ urls: IMG_URLs });
   db.query("SELECT LAST_INSERT_ID() as id", (error, results) => {
     if (error) {
@@ -386,7 +386,7 @@ app.post('/api/imagethumbs', uploadThumb.array('images', 6), (req, res) => {
 
 app.post('/api/fileboard', fileUpload.array('files'), (req, res) => {
 
-  const IMG_URLs = req.files.map(file => `http://localhost:5000/file_uploads/${file.filename}`);
+  const IMG_URLs = req.files.map(file => `https://port-0-partshopback-lme62alhk7lvdw.sel4.cloudtype.app/file_uploads/${file.filename}`);
   console.log(IMG_URLs, 'urlrulrulrul');
 
   res.json({ urls: IMG_URLs });
