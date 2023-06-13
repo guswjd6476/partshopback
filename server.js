@@ -14,15 +14,22 @@ const jwt = require("jsonwebtoken");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(cors())
+app.use(cors());
+app.use(express.json());
+let corsOptions = {
+  origin: "*", // 출처 허용 옵션
+  credential: true, // 사용자 인증이 필요한 리소스(쿠키 ..등) 접근
+};
 
-app.get('/products/:id', function (req, res, next) {
-  res.json({msg: 'This is CORS-enabled for all origins!'})
-})
+app.use(cors(corsOptions));
+//---(1) express 서버 셋팅 및 subscribe. database save---------------------// 
+app.listen(port, () => {
+    console.log(`listening on ${port}`);
+   
+      
 
-app.listen('https://web-partshop-lme62alhk7lvdw.sel4.cloudtype.app', function () {
-  console.log('CORS-enabled web server listening on port 80')
-})
+
+});
 
 // 쿼리문에 사용되는 변수 
 
