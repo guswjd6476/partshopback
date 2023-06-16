@@ -218,6 +218,14 @@ app.get('/api/Alliotlist', (req, res) => {
 
 })
 
+// 이벤트 가져오기
+app.get('/api/getevent', (req, res) => {
+  db.query('SELECT * FROM event', (error, results, fields) => {
+    res.status(200).send(results);
+
+})
+
+})
 
 const path = require('path');
 const multer = require('multer');
@@ -314,7 +322,7 @@ const fileUpload = multer({
 app.get('/api/uploadproduct', (req, res) => {
   console.log(req.query.catenum,'catenum')
  const cost =  Number(req.query.pPrice) * (100 - req.query.dcrate)/100 
- if(req.query.catenum !== '3'){
+ if(req.query.catenum !== '3' &&req.query.catenum !== '4' ){
     db.query('INSERT INTO productlist( title,content,catenum,subcatenum,pName,pquantity,pCost,inch,material,brand,color,dcrate,moq,prepare,pDetail,pPrice) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ', [req.query.title,req.query.content,req.query.catenum,req.query.subcatenum,req.query.pName,req.query.pquantity,req.query.pPrice,req.query.inch,req.query.material,req.query.brand,req.query.color,req.query.dcrate,req.query.moq,req.query.prepare,req.query.detail,cost], (error, results, fields) => {
       if (error) {
         console.error(error);
@@ -324,6 +332,16 @@ app.get('/api/uploadproduct', (req, res) => {
 
       res.status(200).send(true);
     });
+  }else if(req.query.catenum == '4'){
+    db.query('INSERT INTO event( title,content,startday,lastday) VALUES (?,?,?,?) ', [ req.query.title,req.query.content, req.query.startday,req.query.lastday], (error, results, fields) => {
+      if (error) {
+        console.error(error);
+        res.status(500).send(false);
+        return;
+      }
+      res.status(200).send(true);
+    });
+  
   }else{
     db.query('INSERT INTO iotlist( title,content,catenum,subcatenum,pName,brand,pDetail) VALUES (?,?,?,?,?,?,?) ', [ req.query.title,req.query.content, req.query.catenum,req.query.subcatenum,req.query.pName,req.query.brand,req.query.detail], (error, results, fields) => {
       if (error) {
@@ -373,6 +391,25 @@ app.post('/api/imagethumbs', uploadThumb.array('images', 6), (req, res) => {
       const lastInsertId = results[0].id;
       console.log(lastInsertId,'lastInsertId')
       const sql = `UPDATE iotlist SET thumb = ? WHERE id = ?`;
+      const values = [IMG_URLs[0],lastInsertId];
+      db.query(sql, values, (error, results) => {
+        if (error) {
+          console.error(error);
+        }
+      });
+    }
+  });
+});
+app.post('/api/eventthumbs', uploadThumb.array('images', 6), (req, res) => {
+  const IMG_URLs = req.files.map(file => `https://port-0-partshopback-lme62alhk7lvdw.sel4.cloudtype.app/thumb_uploads/${file.filename}`);
+  res.json({ urls: IMG_URLs });
+  db.query("SELECT LAST_INSERT_ID() as id", (error, results) => {
+    if (error) {
+      console.error(error);
+    } else {
+      const lastInsertId = results[0].id;
+      console.log(lastInsertId,'lastInsertId')
+      const sql = `UPDATE event SET thumb = ? WHERE id = ?`;
       const values = [IMG_URLs[0],lastInsertId];
       db.query(sql, values, (error, results) => {
         if (error) {
