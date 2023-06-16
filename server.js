@@ -449,6 +449,7 @@ app.get('/api/getCart', (req, res) => {
   db.query('SELECT p.*,a.*  FROM addcart AS a INNER JOIN productList AS p ON a.productnum = p.id WHERE a.userId = ?',[req.query.userId],(error, results, fields) => {
     console.log(req.query.userId)
     res.status(200).send(results)
+    console.log(results,'cart')
   })
 
 });
