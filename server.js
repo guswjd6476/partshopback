@@ -220,7 +220,7 @@ app.get('/api/Alliotlist', (req, res) => {
 
 // 이벤트 가져오기
 app.get('/api/getevent', (req, res) => {
-  db.query('SELECT * FROM event', (error, results, fields) => {
+  db.query('SELECT * FROM event ORDER BY updatetime DESC', (error, results, fields) => {
     res.status(200).send(results);
 
 })
