@@ -234,7 +234,7 @@ app.get('/api/getsubevent', (req, res) => {
 })
 
 })
-
+import fs from 'fs';
 const path = require('path');
 const multer = require('multer');
 
