@@ -239,7 +239,7 @@ const path = require('path');
 const multer = require('multer');
 
 app.use(express.urlencoded({ extended: false })); // 내부 url 파서 사용
-app.use(express.static(path.join(__dirname + '/public'))); // 정적 파일 위치 설정
+app.use('/public',express.static(path.join(__dirname + '/public'))); // 정적 파일 위치 설정
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
