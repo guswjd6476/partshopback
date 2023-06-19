@@ -226,6 +226,14 @@ app.get('/api/getevent', (req, res) => {
 })
 
 })
+// 이벤트 가져오기
+app.get('/api/getsubevent', (req, res) => {
+  db.query('SELECT * FROM event WHERE id = ?',[req.query.id], (error, results, fields) => {
+    res.status(200).send(results);
+
+})
+
+})
 
 const path = require('path');
 const multer = require('multer');
