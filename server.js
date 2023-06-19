@@ -239,11 +239,11 @@ const path = require('path');
 const multer = require('multer');
 
 app.use(express.urlencoded({ extended: false })); // 내부 url 파서 사용
-app.use(express.static(path.join(__dirname + '/public'))); // 정적 파일 위치 설정
+app.use(express.static(path.join(__dirname + 'public'))); // 정적 파일 위치 설정
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, '/public/uploads')
+    cb(null, 'public/uploads')
   },
   filename: function (req, file, cb) {
     const ext = path.extname(file.originalname);
@@ -300,7 +300,7 @@ app.get('/api/userlist', (req, res) => {
 const uploadThumb = multer({
   storage: multer.diskStorage({
     destination(req, file, cb) {
-      cb(null, '/public/thumb_uploads');
+      cb(null, 'public/thumb_uploads');
     },
     filename(req, file, cb) {
       const ext = path.extname(file.originalname);
@@ -313,7 +313,7 @@ const uploadThumb = multer({
 const fileUpload = multer({
   storage: multer.diskStorage({
     destination(req, file, cb) {
-      cb(null, '/public/file_uploads');
+      cb(null, 'public/file_uploads');
     },
     filename(req, file, cb) {
       const ext = path.extname(file.originalname);
