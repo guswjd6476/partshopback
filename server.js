@@ -760,7 +760,8 @@ app.get('/api/prevNext', (req, res) => {
   const sql = 
   id === 'notice' ? 
   'SELECT * FROM notice WHERE id IN ((SELECT id FROM notice WHERE id < ? ORDER BY id DESC LIMIT 1),(SELECT id FROM notice WHERE id > ? ORDER BY id ASC LIMIT 1))'
-  : 'SELECT * FROM qna WHERE id IN ((SELECT id FROM qna WHERE id < ? ORDER BY id DESC LIMIT 1),(SELECT id FROM qna WHERE id > ? ORDER BY id ASC LIMIT 1))'
+  :id === 'qna' ?  'SELECT * FROM qna WHERE id IN ((SELECT id FROM qna WHERE id < ? ORDER BY id DESC LIMIT 1),(SELECT id FROM qna WHERE id > ? ORDER BY id ASC LIMIT 1))'
+  :  'SELECT * FROM event WHERE id IN ((SELECT id FROM event WHERE id < ? ORDER BY id DESC LIMIT 1),(SELECT id FROM qna WHERE id > ? ORDER BY id ASC LIMIT 1))'
   ;
   db.query(sql, [num, num], (error, results, fields) => {
     if (error) {
