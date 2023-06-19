@@ -368,7 +368,7 @@ app.get('/api/uploadproduct', (req, res) => {
 app.post('/api/imagethumb', uploadThumb.array('images', 6), (req, res) => {
   console.log(uploadThumb,'?')
   console.log(req.files)
-  const IMG_URLs = req.files.map(file => `http://localhost:5000/thumb_uploads/${file.filename}`);
+  const IMG_URLs = req.files.map(file => `https://port-0-partshopback-lme62alhk7lvdw.sel4.cloudtype.app/thumb_uploads/${file.filename}`);
   console.log(IMG_URLs, 'urlrulrulrul');
 
   res.json({ urls: IMG_URLs });
