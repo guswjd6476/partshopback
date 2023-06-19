@@ -1,6 +1,7 @@
 const express = require('express');
 const db = require("./DB.js"); //database 
 
+
 const app = express();
 const mailer = require('./mail');
 
@@ -234,10 +235,9 @@ app.get('/api/getsubevent', (req, res) => {
 })
 
 })
-import fs from 'fs';
 const path = require('path');
 const multer = require('multer');
-
+const fs = require('fs');
 // app.use(express.urlencoded({ extended: false })); // 내부 url 파서 사용
 (function () {
   const dir = 'public/thumb_uploads/';
