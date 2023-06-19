@@ -238,12 +238,26 @@ app.get('/api/getsubevent', (req, res) => {
 const path = require('path');
 const multer = require('multer');
 
-app.use(express.urlencoded({ extended: false })); // 내부 url 파서 사용
+// app.use(express.urlencoded({ extended: false })); // 내부 url 파서 사용
+(function () {
+  const dir = 'public/thumb_uploads/';
+  if (!fs.existsSync(dir)) {
+    console.log('src 폴더가 없습니다. 폴더를 생성합니다.');
+    const subDirs = dir.split('/');
+    let currentDir = '';
+    for (const subDir of subDirs) {
+      currentDir += subDir + '/';
+      if (!fs.existsSync(currentDir)) {
+        fs.mkdirSync(currentDir);
+      }
+    }
+  }
+})();
 app.use('/public',express.static(path.join(__dirname + '/public'))); // 정적 파일 위치 설정
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'public/uploads')
+    cb(null, 'public/uploads/')
   },
   filename: function (req, file, cb) {
     const ext = path.extname(file.originalname);
@@ -303,7 +317,7 @@ app.get('/api/userlist', (req, res) => {
 const uploadThumb = multer({
   storage: multer.diskStorage({
     destination(req, file, cb) {
-      cb(null, 'public/thumb_uploads');
+      cb(null, 'public/thumb_uploads/');
     },
     filename(req, file, cb) {
       const ext = path.extname(file.originalname);
