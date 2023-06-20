@@ -242,9 +242,7 @@ app.use(express.urlencoded({ extended: false })); // 내부 url 파서 사용
 app.use(express.static(path.join(__dirname + '/public'))); // 정적 파일 위치 설정
 
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, '/images')
-  },
+
   filename: function (req, file, cb) {
     const ext = path.extname(file.originalname);
     cb(null, `${path.basename(file.originalname, ext)}-${Date.now()}${ext}`);
@@ -258,7 +256,7 @@ app.post('/api/images', upload.single('img'), (req, res) => {
   console.log('전달받은 파일', req.file);
   console.log('저장된 파일의 이름', req.file.filename);
   // 파일이 저장된 경로를 클라이언트에게 반환해준다.
-  const IMG_URL = `https://guswjd6476.speedgabia.com/images/${file.filename}`;
+  const IMG_URL = `https://guswjd6476.speedgabia.com/thumbs/${file.filename}`;
   console.log(IMG_URL);
   res.json({ url: IMG_URL });
 });
