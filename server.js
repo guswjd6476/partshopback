@@ -243,7 +243,7 @@ app.use(express.static(path.join(__dirname + '/public'))); // 정적 파일 위�
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'public/uploads')
+    cb(null, '/images')
   },
   filename: function (req, file, cb) {
     const ext = path.extname(file.originalname);
@@ -259,7 +259,7 @@ app.post('/api/images', upload.single('img'), (req, res) => {
   console.log('전달받은 파일', req.file);
   console.log('저장된 파일의 이름', req.file.filename);
   // 파일이 저장된 경로를 클라이언트에게 반환해준다.
-  const IMG_URL = `https://port-0-partshopback-lme62alhk7lvdw.sel4.cloudtype.app/uploads/${req.file.filename}`;
+  const IMG_URL = `https://guswjd6476.speedgabia.com/images/${file.filename}`;
   console.log(IMG_URL);
   res.json({ url: IMG_URL });
 });
@@ -302,14 +302,12 @@ app.get('/api/userlist', (req, res) => {
 //썸네일 업로드 
 const uploadThumb = multer({
   storage: multer.diskStorage({
-    destination(req, file, cb) {
-      cb(null, 'public/thumb_uploads');
-    },
+  
     filename(req, file, cb) {
       const ext = path.extname(file.originalname);
 
       console.log('file.originalname', file.originalname);
-      cb(null, path.basename(file.originalname, ext) + Date.now() + ext);
+      cb(null, path.basename(file.originalname, ext) + ext);
     },
   }),
 });
@@ -321,7 +319,7 @@ const fileUpload = multer({
     filename(req, file, cb) {
       const ext = path.extname(file.originalname);
       const decodedFileName = decodeURIComponent(file.originalname);
-      cb(null, path.basename(decodedFileName, ext) + Date.now() + ext);
+      cb(null, path.basename(decodedFileName, ext));
     },
   }),
 });
@@ -368,7 +366,7 @@ app.get('/api/uploadproduct', (req, res) => {
 app.post('/api/imagethumb', uploadThumb.array('images', 6), (req, res) => {
   console.log(uploadThumb,'?')
   console.log(req.files)
-  const IMG_URLs = req.files.map(file => `https://port-0-partshopback-lme62alhk7lvdw.sel4.cloudtype.app/thumb_uploads/${file.filename}`);
+  const IMG_URLs = req.files.map(file => `https://guswjd6476.speedgabia.com/thumb/${file.filename}`);
   console.log(IMG_URLs, 'urlrulrulrul');
 
   res.json({ urls: IMG_URLs });
@@ -390,7 +388,7 @@ app.post('/api/imagethumb', uploadThumb.array('images', 6), (req, res) => {
   });
 });
 app.post('/api/imagethumbs', uploadThumb.array('images', 6), (req, res) => {
-  const IMG_URLs = req.files.map(file => `https://port-0-partshopback-lme62alhk7lvdw.sel4.cloudtype.app/thumb_uploads/${file.filename}`);
+  const IMG_URLs = req.files.map(file =>`https://guswjd6476.speedgabia.com/thumb/${file.filename}`);
   res.json({ urls: IMG_URLs });
   db.query("SELECT LAST_INSERT_ID() as id", (error, results) => {
     if (error) {
@@ -409,7 +407,7 @@ app.post('/api/imagethumbs', uploadThumb.array('images', 6), (req, res) => {
   });
 });
 app.post('/api/eventthumbs', uploadThumb.array('images', 6), (req, res) => {
-  const IMG_URLs = req.files.map(file => `https://port-0-partshopback-lme62alhk7lvdw.sel4.cloudtype.app/thumb_uploads/${file.filename}`);
+  const IMG_URLs = req.files.map(file =>`https://guswjd6476.speedgabia.com/thumb/${file.filename}`);
   res.json({ urls: IMG_URLs });
   db.query("SELECT LAST_INSERT_ID() as id", (error, results) => {
     if (error) {
@@ -431,7 +429,7 @@ app.post('/api/eventthumbs', uploadThumb.array('images', 6), (req, res) => {
 
 app.post('/api/fileboard', fileUpload.array('files'), (req, res) => {
 
-  const IMG_URLs = req.files.map(file => `https://port-0-partshopback-lme62alhk7lvdw.sel4.cloudtype.app/file_uploads/${file.filename}`);
+  const IMG_URLs = req.files.map(file => `https://guswjd6476.speedgabia.com//file_uploads/${file.filename}`);
   console.log(IMG_URLs, 'urlrulrulrul');
 
   res.json({ urls: IMG_URLs });
