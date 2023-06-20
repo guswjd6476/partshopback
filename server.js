@@ -250,6 +250,19 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
+// 게시글 업로드
+//썸네일 업로드 
+const uploadThumb = multer({
+  storage: multer.diskStorage({
+  
+    filename(req, file, cb) {
+      const ext = path.extname(file.originalname);
+
+      console.log('file.originalname', file.originalname);
+      cb(null, path.basename(file.originalname, ext) + ext);
+    },
+  }),
+});
 
 app.post('/api/images', uploadThumb.single('img'), (req, res) => {
 
@@ -295,19 +308,7 @@ app.get('/api/userlist', (req, res) => {
 
 })
 
-// 게시글 업로드
-//썸네일 업로드 
-const uploadThumb = multer({
-  storage: multer.diskStorage({
-  
-    filename(req, file, cb) {
-      const ext = path.extname(file.originalname);
 
-      console.log('file.originalname', file.originalname);
-      cb(null, path.basename(file.originalname, ext) + ext);
-    },
-  }),
-});
 const fileUpload = multer({
   storage: multer.diskStorage({
     destination(req, file, cb) {
