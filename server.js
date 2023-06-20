@@ -269,7 +269,7 @@ app.post('/api/images', uploadThumb.single('img'), (req, res) => {
   console.log('전달받은 파일', req.file);
   console.log('저장된 파일의 이름', req.file.filename);
   // 파일이 저장된 경로를 클라이언트에게 반환해준다.
-  const IMG_URL = `https://guswjd6476.speedgabia.com/thumbs/${file.filename}`;
+  const IMG_URL = `https://guswjd6476.speedgabia.com/thumbs/${req.file.filename}`;
   console.log(IMG_URL);
   res.json({ url: IMG_URL });
 });
