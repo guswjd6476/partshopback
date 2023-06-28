@@ -307,8 +307,18 @@ app.get('/api/userlist', (req, res) => {
 })
 
 })
-
-
+// 특정유저 정보
+app.get('/api/getUser', (req, res) => {
+  db.query('SELECT * FROM userinfo WHERE userId = ?',[req.query.userId], (error, results, fields) => {
+    res.status(200).send(results);
+})
+})
+// 유저가 등록한 배송지
+app.get('/api/getAddress', (req, res) => {
+  db.query('SELECT * FROM address WHERE userId = ?',[req.query.userId], (error, results, fields) => {
+    res.status(200).send(results);
+})
+})
 const fileUpload = multer({
   storage: multer.diskStorage({
     destination(req, file, cb) {
