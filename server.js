@@ -328,6 +328,7 @@ app.get('/api/addAddress', (req, res) => {
 // 배송지선택
 app.get('/api/selectAddress', (req, res) => {
   db.query('UPDATE address SET selected = CASE WHEN id = ? THEN 1 ELSE 0 END', [req.query.num], (error, results, fields) => {
+    console.log(num,'아이디')
     if (error) {
       // 오류 처리
       console.error(error);
