@@ -319,6 +319,13 @@ app.get('/api/getAddress', (req, res) => {
     res.status(200).send(results);
 })
 })
+// 추가한 배송지
+app.get('/api/addAddress', (req, res) => {
+  db.query('INSERT INTO address(userId,address,addtype,addressnum,subaddress,uName,uPhone) VALUES (?,?,?,?,?,?,?) ',[req.query.userId,req.query.address,req.query.addtype,req.query.addressnum,req.query.subaddress,req.query.uName,req.query.uPhone], (error, results, fields) => {
+    res.status(200).send(results);
+})
+})
+
 const fileUpload = multer({
   storage: multer.diskStorage({
     destination(req, file, cb) {
