@@ -316,6 +316,7 @@ app.get('/api/getUser', (req, res) => {
 // 유저가 등록한 배송지
 app.get('/api/getAddress', (req, res) => {
   db.query('SELECT * FROM address WHERE userId = ?',[req.query.userId], (error, results, fields) => {
+    console.log(req.query.userId,'요청된 배송지ㅑㅇ')
     res.status(200).send(results);
 })
 })
