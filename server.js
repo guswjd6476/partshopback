@@ -325,6 +325,15 @@ app.get('/api/addAddress', (req, res) => {
     res.status(200).send(results);
 })
 })
+// 배송지선택
+app.get('/api/selectAddress', (req, res) => {
+  db.query('UPDATE address SET selected = ? WHERE userId = ?',[0, req.query.userId], (error, results, fields) => {
+    res.status(200).send(true);
+})
+  db.query('UPDATE address SET selected = ? WHERE id = ?',[1, req.query.num], (error, results, fields) => {
+    res.status(200).send(true);
+})
+})
 
 const fileUpload = multer({
   storage: multer.diskStorage({
