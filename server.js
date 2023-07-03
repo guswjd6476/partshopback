@@ -847,3 +847,12 @@ app.get('/api/getOrderlist', (req, res) => {
 })
 
 })
+
+// 주문후기목록 불러오기 
+app.get('/api/getAfterbuylist', (req, res) => {
+  db.query('SELECT p.*,a.*  FROM afterbuy AS a INNER JOIN productlist AS p ON a.productnum = p.id WHERE a.userId = ?',[req.query.userId], (error, results, fields) => {
+    res.status(200).send(results);
+ 
+})
+
+})
