@@ -856,3 +856,10 @@ app.get('/api/getAfterbuylist', (req, res) => {
 })
 
 })
+
+// 주문후기 작성하기 
+app.get('/api/addAfeterbuylist', (req, res) => {
+  db.query('INSERT INTO address(productnum,userId,title,rate,content) VALUES (?,?,?,?,?) ',[req.query.num,req.query.userId,req.query.title,req.query.rate,req.query.content], (error, results, fields) => {
+    res.status(200).send(true);
+})
+})
