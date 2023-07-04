@@ -863,3 +863,11 @@ app.get('/api/addAfeterbuylist', (req, res) => {
     res.status(200).send(true);
 })
 })
+// 주문후기 페이지에 나타내기
+app.get('/api/getThisAfterbuylist', (req, res) => {
+  db.query('SELECT p.*,a.*  FROM afterbuy AS a INNER JOIN productlist AS p ON a.productnum = p.id WHERE a.productnum = ?',[req.query.num], (error, results, fields) => {
+    res.status(200).send(results);
+ 
+})
+
+})
