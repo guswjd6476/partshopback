@@ -878,3 +878,18 @@ app.get('/api/getThisAfterbuylist', (req, res) => {
 })
 
 })
+
+// 운송장등록 /api/addDeliver
+app.get('/api/selectAddress', (req, res) => {
+  db.query('UPDATE buylist SET dNum = ? ,carrier = ? WHERE id = ? ', [req.query.dNum,req.query.carriers,req.query.id], (error, results, fields) => {
+   
+    if (error) {
+      // 오류 처리
+      console.error(error);
+      res.status(500).send(false);
+      return;
+    }
+  
+    res.status(200).send(true);
+  });
+})
