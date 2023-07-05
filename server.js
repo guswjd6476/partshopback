@@ -838,7 +838,14 @@ app.get('/api/getmain', (req, res) => {
 })
 
 })
+// 모든주문목록 불러오기 
+app.get('/api/getAllOrderlist', (req, res) => {
+  db.query('SELECT p.*,a.*  FROM buylist AS a INNER JOIN productlist AS p ON a.productnum = p.id', (error, results, fields) => {
+    res.status(200).send(results);
+ 
+})
 
+})
 // 주문목록 불러오기 
 app.get('/api/getOrderlist', (req, res) => {
   db.query('SELECT p.*,a.*  FROM buylist AS a INNER JOIN productlist AS p ON a.productnum = p.id WHERE a.userId = ?',[req.query.userId], (error, results, fields) => {
