@@ -881,7 +881,7 @@ app.get('/api/getThisAfterbuylist', (req, res) => {
 
 // 운송장등록 /api/addDeliver
 app.get('/api/addDeliver', (req, res) => {
-  db.query('UPDATE buylist SET dNum = ? ,carrier = ? WHERE id = ? ', [req.query.dNum,req.query.carriers,req.query.id], (error, results, fields) => {
+  db.query('UPDATE buylist SET buystate = ? , dNum = ? ,carrier = ? WHERE id = ? ', [req.query.state,req.query.dNum,req.query.carriers,req.query.id], (error, results, fields) => {
    
     if (error) {
       // 오류 처리
