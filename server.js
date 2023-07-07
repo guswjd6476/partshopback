@@ -898,10 +898,16 @@ app.get('/api/addDeliver', (req, res) => {
 
 // 찜목록 가져오기
 app.get('/api/getNeeds', (req, res) => {
-  db.query('SELECT p.*,a.*,c.category,pd.subcategory FROM needs AS a INNER JOIN productlist AS p ON a.productnum = p.id  JOIN category AS c ON  p.catenum = c.catenum JOIN productdata AS pd ON  p.subcatenum = pd.subcatenum  WHERE a.userId = ?',[req.query.userId], (error, results, fields) => {
-    console.log(req.query.userId,'userId')
+  db.query('SELECT p.catenum,p.subcatenum,p.Name,p.Price,p.img1,p.Detail,a.*,c.category,pd.subcategory FROM needs AS a INNER JOIN productlist AS p ON a.productnum = p.id  JOIN category AS c ON  p.catenum = c.catenum JOIN productdata AS pd ON  p.subcatenum = pd.subcatenum  WHERE a.userId = ?',[req.query.userId], (error, results, fields) => {
     res.status(200).send(results);
- 
 })
+})
+// 찜목록 지우기
+app.get('/api/deleteNeeds', (req, res) => {
+  db.query('DELETE FROM needs WHERE id = ?',[req.query.num],(error, results, fields) => {
 
-})
+  })
+  
+  res.status(200).send(true);
+
+});
