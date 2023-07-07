@@ -894,3 +894,13 @@ app.get('/api/addDeliver', (req, res) => {
     res.status(200).send(true);
   });
 })
+
+
+// 찜목록 가져오기
+app.get('/api/getNeeds', (req, res) => {
+  db.query('SELECT p.*,a.*  FROM needs AS a INNER JOIN productlist AS p ON a.productnum = p.id WHERE a.userId = ?',[req.query.userId], (error, results, fields) => {
+    res.status(200).send(results);
+ 
+})
+
+})
