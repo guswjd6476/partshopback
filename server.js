@@ -576,13 +576,14 @@ app.get('/api/addNeeds', (req, res) => {
 
 
 app.get('/api/getcompare', (req, res) => {
+  if(req.query.num[0]){
   const values = (req.query.num[0]&&req.query.num[0].productnum&&req.query.num.map(value => value.productnum))|| req.query.num
   const query = `SELECT * FROM productlist WHERE id IN (${values.map(val => '?').join(',')})`
   db.query(query,values,(error, results, fields) => {
     console.log(req.query.userId)
     res.status(200).send(results)
   })
-
+}
 });
 
 app.get('/api/getpass', (req, res) => {
