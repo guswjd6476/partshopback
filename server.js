@@ -920,3 +920,9 @@ app.get('/api/deleteNeeds', (req, res) => {
   res.status(200).send(true);
 
 });
+// 문의사항 작성하기 
+app.get('/api/addinquiry', (req, res) => {
+  db.query('INSERT INTO addinquiry(productnum,userId,content) VALUES (?,?,?) ',[req.query.num,req.query.userId,req.query.content], (error, results, fields) => {
+    res.status(200).send(true);
+})
+})
