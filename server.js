@@ -726,6 +726,14 @@ app.get('/api/getItemcon', (req, res) => {
   })
 
 });
+// 특정 게시물 가져오기 2
+app.get('/api/getwriteQna', (req, res) => {
+  const sql = 'SELECT * FROM qna WHERE writer = ?'
+  db.query(sql,[req.query.writer],(error, results, fields) => {
+    res.status(200).send(results);
+  })
+
+});
 // 게시물 삭제하기
 app.get('/api/dItem', (req, res) => {
   const path = req.query.path
