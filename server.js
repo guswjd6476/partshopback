@@ -928,6 +928,6 @@ app.get('/api/addinquiry', (req, res) => {
 })
 app.get('/api/getinquiry', (req, res) => {
   db.query('SELECT p.*,a.*  FROM addinquiry AS a INNER JOIN productlist AS p ON a.productnum = p.id WHERE a.productnum = ?',[req.query.num], (error, results, fields) => {
-    res.status(200).send(true);
+    res.status(200).send(results);
 })
 })
