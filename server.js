@@ -193,7 +193,7 @@ app.get('/api/getproduct', (req, res) => {
 
 //상세
 app.get('/api/productdetail', (req, res) => {
-  db.query('SELECT p.*,c.category,pd.subcategory FROM productlist AS p INNER JOIN category AS c ON  p.catenum = c.catenum JOIN productdata AS pd ON  p.subcatenum = pd.subcatenum  WHERE a.userId = ?',[req.query.id], (error, results, fields) => {
+  db.query('SELECT p.*,c.category,pd.subcategory FROM productlist AS p INNER JOIN category AS c ON  p.catenum = c.catenum JOIN productdata AS pd ON  p.subcatenum = pd.subcatenum  WHERE p.id = ?',[req.query.id], (error, results, fields) => {
     res.status(200).send(results);
 
 })
