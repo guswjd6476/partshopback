@@ -922,7 +922,8 @@ app.get('/api/deleteNeeds', (req, res) => {
 });
 // 문의사항 작성하기 
 app.get('/api/addinquiry', (req, res) => {
-  db.query('INSERT INTO addinquiry(productnum,userId,content,category,type) VALUES (?,?,?,?,?) ',[req.query.num,req.query.userId,req.query.content,req.query.category,req.query.type], (error, results, fields) => {
+  const answer = req.query.type === 1 ? null : req.query.answerid
+  db.query('INSERT INTO addinquiry(productnum,userId,content,category,type,answerid) VALUES (?,?,?,?,?,?) ',[req.query.num,req.query.userId,req.query.content,req.query.category,req.query.type,answer], (error, results, fields) => {
     res.status(200).send(true);
 })
 })
