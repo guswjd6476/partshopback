@@ -922,10 +922,12 @@ app.get('/api/deleteNeeds', (req, res) => {
 });
 // 문의사항 작성하기 
 app.get('/api/addinquiry', (req, res) => {
-  db.query('INSERT INTO addinquiry(productnum,userId,content) VALUES (?,?,?) ',[req.query.num,req.query.userId,req.query.content], (error, results, fields) => {
+  db.query('INSERT INTO addinquiry(productnum,userId,content,category,type) VALUES (?,?,?,?,?) ',[req.query.num,req.query.userId,req.query.content,req.query.category,req.query.type], (error, results, fields) => {
     res.status(200).send(true);
 })
 })
+
+
 app.get('/api/getinquiry', (req, res) => {
   db.query('SELECT p.*,a.*  FROM addinquiry AS a INNER JOIN productlist AS p ON a.productnum = p.id WHERE a.productnum = ?',[req.query.num], (error, results, fields) => {
     res.status(200).send(results);
