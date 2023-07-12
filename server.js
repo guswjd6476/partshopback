@@ -48,13 +48,16 @@ async function updateJsonData(jsonData) {
       progress.location.name,
       progress.status.text
     ]);
-
-    db.query(progressQuery, [progressValues], (progressError) => {
-      if (progressError) {
-        console.error('Error updating progress:', progressError);
-        return;
-      }
+    progressValues.forEach((item) => {
+      db.query(progressQuery, [item], (progressError) => {
+        if (progressError) {
+          console.error('Error updating progress:', progressError);
+          return;
+        }
+      });
     });
+
+   
   } catch (error) {
     console.error('Error:', error);
   }
