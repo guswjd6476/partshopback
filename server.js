@@ -25,11 +25,14 @@ app.use(cors(corsOptions));
 //---(1) express 서버 셋팅 및 subscribe. database save---------------------// 
 app.listen(port, () => {
     console.log(`listening on ${port}`);
-   
-      
+  //   app.get(`https://apis.tracker.delivery/carriers/${carriers}/tracks/${num}`, (req, res) => {
+  // db.query('INSERT IGNORE INTO deliverlist(time,location,status,delivernum,carrier) VALUES (?,?,?,? , ? ) ON DUPLICATE KEY UPDATE time = ? , location =? , status =? , delivernum = ? , carrier = ? ', [], (error, results, fields) => {
+  //     })
+  //   })
 
 
 });
+
 
 // 쿼리문에 사용되는 변수 
 
