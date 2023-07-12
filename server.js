@@ -1,9 +1,9 @@
 const express = require('express');
 const db = require("./DB.js"); //database 
-
+const fs = require('fs')
 const app = express();
 const mailer = require('./mail');
-
+const axios = require('axios')
 let cors = require('cors'); // 설치시 모든 도메인에서 제한 없이 해당 서버에 용청 및 응답을 받을 수 있음.
 const bodyParser = require('body-parser');
 app.use(bodyParser.json({ limit: '10mb' }));
@@ -30,12 +30,83 @@ app.listen(port, () => {
   //     })
   //   })
 
-
 });
 
+const apiEndpoint = 'https://apis.tracker.delivery/carriers/kr.cjlogistics/tracks/577519556645';
 
-// 쿼리문에 사용되는 변수 
+async function updateJsonData(jsonData) {
+  // JSON 데이터 파싱
+  const data = jsonData;
+  console.log(data.progress);
+  
+  try {
+    // 데이터베이스 업데이트
+    const progresses = data.progresses;
+    const progressQuery = 'INSERT INTO deliverlist(time, location, status) VALUES (?)';
+    const progressValues = progresses.map((progress) => [
+      progress.time,
+      progress.location.name,
+      progress.status.text
+    ]);
 
+    db.query(progressQuery, [progressValues], (progressError) => {
+      if (progressError) {
+        console.error('Error updating progress:', progressError);
+        return;
+      }
+    });
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+// JSON 데이터를 가져와서 데이터베이스를 업데이트하는 함수
+async function updateDataFromAPI() {
+  try {
+    // API로부터 데이터 가져오기
+    const response = await axios.get(apiEndpoint);
+    const jsonData = response.data;
+
+    // JSON 데이터 파싱
+    const data = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+    console.log(data, 'data');
+    console.log(jsonData, 'jsonData');
+
+    // 이미 연결된 상태인지 확인
+    if (db.state === 'disconnected') {
+      // 연결이 해제된 경우에만 새로운 연결 생성
+      db.connect((err) => {
+        if (err) {
+          console.error('Error connecting to database:', err);
+          return;
+        }
+
+        console.log('Connected to database');
+
+        // 데이터베이스 업데이트 로직 추가...
+        updateJsonData(data);
+
+        // 연결 해제
+        db.end();
+      });
+    } else {
+      console.log('Already connected to database');
+
+      updateJsonData(data);
+    }
+  } catch (error) {
+    console.error('Error fetching data from API:', error);
+  }
+}
+
+// 데이터베이스 업데이트를 실행하는 API 엔드포인트
+app.get('/api/updateData', (req, res) => {
+  updateDataFromAPI();
+  res.sendStatus(200);
+});
+
+// 서버 시작 시 초기 데이터베이스 업데이트 실행
+updateDataFromAPI();
 // 회원가입 _ 중복확인
 app.get('/api/useridcheck', (req, res) => {
   db.query('SELECT * FROM userinfo WHERE userId = ?', [req.query.userId], (error, results, fields) => {
