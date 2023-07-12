@@ -42,11 +42,14 @@ async function updateJsonData(jsonData) {
   try {
     // 데이터베이스 업데이트
     const progresses = data.progresses;
-    const progressQuery = 'INSERT INTO deliverlist(time, location, status) VALUES (?)';
+    const progressQuery = 'INSERT INTO deliverlist(time, location, status,delivernum,carrier,dupnum) VALUES (?)';
     const progressValues = progresses.map((progress) => [
       progress.time,
       progress.location.name,
-      progress.status.text
+      progress.status.text,
+      data.carrier.id,
+      data.carrier.name,
+      progress.time+data.carrier.id
     ]);
     progressValues.forEach((item) => {
       db.query(progressQuery, [item], (progressError) => {
@@ -55,6 +58,7 @@ async function updateJsonData(jsonData) {
           return;
         }
       });
+     db.query('ALTER TABLE deliverlist ADD UNIQUE INDEX (dupnum)')
     });
 
    
