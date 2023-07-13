@@ -26,8 +26,7 @@ app.use(cors(corsOptions));
 app.listen(port, () => {
     console.log(`listening on ${port}`);
 });
-let deliverData = [];
-
+let deliverData=[]
 async function updateJsonData(data, productnum) {
   try {
     // 데이터베이스 업데이트
@@ -41,14 +40,14 @@ async function updateJsonData(data, productnum) {
       progress.time + data.number,
     ]);
 
-    const progressQuery =
-      'INSERT INTO deliverlist (time, location, status, delivernum, carrier, dupnum) VALUES ? ON DUPLICATE KEY UPDATE dupnum = VALUES(dupnum)';
+    const progressQuery = 'INSERT INTO deliverlist (time, location, status, delivernum, carrier, dupnum) VALUES ? ON DUPLICATE KEY UPDATE dupnum = VALUES(dupnum)';
 
     await new Promise((resolve, reject) => {
       db.query(progressQuery, [progressValues], (progressError, progressResults) => {
         if (progressError) {
           reject(progressError);
         } else {
+          con
           console.log('Progress updated:', progressResults);
           resolve();
         }
@@ -98,21 +97,27 @@ async function updateDataFromAPI(productnum, carrier, number) {
 // deliverData 처리
 async function processDeliverData() {
   try {
-    const query = 'SELECT * FROM buylist';
-
-    const [rows] = await db.promise().execute(query);
-
-    deliverData = rows.map((row) => ({
-      productnum: row.productnum,
-      carrier: row.carrier,
-      number: row.dNum,
-    }));
-
+    const query = 'SELECT buylist.dNum, buylist.carrier, buylist.productnum FROM buylist';
+    db.query('SELECT * FROM buylist' ,(error, results, fields) => {
+      console.log(results,'results')
+      results.forEach(function (item, index, arr) {
+        deliverData.push({
+          productnum : arr[index].productnum, 
+          carrier : arr[index].carrier, 
+          number : arr[index].dNum, 
+          
+        })
+    })
+  })
+  if(deliverData[0]){ 
     for (const data of deliverData) {
-      console.log(deliverData, 'deliverdata');
+      console.log(deliverData,'deliverdata')
       await updateDataFromAPI(data.productnum, data.carrier, data.number);
     }
-  } catch (error) {
+  }
+  }
+  
+  catch (error) {
     console.error('Error processing deliverData:', error);
   }
 }
