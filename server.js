@@ -77,17 +77,13 @@ async function updateDataFromAPI(productnum, carrier, number) {
     const apiEndpoint = `https://apis.tracker.delivery/carriers/${carrier}/tracks/${number}`;
     const response = await axios.get(apiEndpoint);
     const data = response.data;
-    console.log('Data fetched:', data);
-
-    // 데이터베이스 연결
-    db.connect((err) => {
-      if (err) {
-        console.error('Error connecting to database:', err);
-        return;
-      }
-      console.log('Connected to database');
-      updateJsonData(data, productnum);
-    });
+    if (err) {
+      console.error('Error connecting to database:', err);
+      return;
+    }
+    console.log('Connected to database');
+    updateJsonData(data, productnum);
+  
   } catch (error) {
     console.error('Error fetching data from API:', error);
   }
