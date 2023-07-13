@@ -100,7 +100,7 @@ async function processDeliverData() {
   try {
     const query = 'SELECT buylist.dNum, buylist.carrier, buylist.productnum FROM buylist';
 
-    const [rows] = await db.promise().execute(query);
+    const [rows] = await db.query().execute(query);
 
     deliverData = rows.map((row) => ({
       productnum: row.productnum,
