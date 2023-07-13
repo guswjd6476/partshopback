@@ -40,7 +40,7 @@ async function updateJsonData(data, productnum) {
       progress.time + data.number,
     ]);
 
-    const progressQuery = 'INSERT INTO deliverlist (time, location, status, delivernum, carrier, dupnum) VALUES ? ON DUPLICATE KEY UPDATE dupnum = VALUES(dupnum)';
+    const progressQuery = 'INSERT IGNORE INTO deliverlist (time, location, status, delivernum, carrier, dupnum) VALUES ? ON DUPLICATE KEY UPDATE dupnum = VALUES(dupnum)';
 
     await new Promise((resolve, reject) => {
       db.query(progressQuery, [progressValues], (progressError, progressResults) => {
