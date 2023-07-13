@@ -111,8 +111,6 @@ async function processDeliverData() {
      updateDataFromAPI(data.productnum, data.carrier, data.number);
   }
 
-  // 연결 종료
-  db.end();
 })}
 
 // deliverData 처리
