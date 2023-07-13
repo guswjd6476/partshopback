@@ -47,7 +47,6 @@ async function updateJsonData(data, productnum) {
         if (progressError) {
           reject(progressError);
         } else {
-          con
           console.log('Progress updated:', progressResults);
           resolve();
         }
