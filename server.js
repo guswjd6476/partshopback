@@ -26,7 +26,7 @@ app.use(cors(corsOptions));
 app.listen(port, () => {
     console.log(`listening on ${port}`);
 });
-let deliverData=[]
+
 async function updateJsonData(data, productnum) {
   try {
     // 데이터베이스 업데이트
@@ -96,6 +96,7 @@ async function updateDataFromAPI(productnum, carrier, number) {
 
 // deliverData 처리
 async function processDeliverData() {
+  let deliverData=[]
   try {
     const query = 'SELECT buylist.dNum, buylist.carrier, buylist.productnum FROM buylist';
     db.query('SELECT * FROM buylist' ,(error, results, fields) => {
@@ -109,6 +110,7 @@ async function processDeliverData() {
         })
     })
   })
+  console.log(deliverData,'?????')
   if(deliverData[0]){ 
     for (const data of deliverData) {
       console.log(deliverData,'deliverdata')
