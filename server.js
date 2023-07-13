@@ -98,8 +98,8 @@ async function processDeliverData() {
   try {
     const query = 'SELECT buylist.dNum, buylist.carrier, buylist.productnum FROM buylist';
     db.query('SELECT * FROM buylist' ,(error, results, fields) => {
+      console.log(results,'results')
       results.forEach(function (item, index, arr) {
-       
         deliverData.push({
           productnum : arr[index].productnum, 
           carrier : arr[index].carrier, 
@@ -110,6 +110,7 @@ async function processDeliverData() {
   })
    
     for (const data of deliverData) {
+      console.log(deliverData,'deliverdata')
       await updateDataFromAPI(data.productnum, data.carrier, data.number);
     }
   } catch (error) {
