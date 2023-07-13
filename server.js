@@ -31,89 +31,93 @@ app.listen(port, () => {
   //   })
 
 });
-
-const apiEndpoint = 'https://apis.tracker.delivery/carriers/kr.cjlogistics/tracks/577519556645';
-
-async function updateJsonData(jsonData) {
-  // JSON 데이터 파싱
-  const data = jsonData;
-  console.log(data.progress);
-  
+let deliverData = []
+async function updateJsonData(data,productnum) {
   try {
+
     // 데이터베이스 업데이트
     const progresses = data.progresses;
-    const progressQuery = 'INSERT INTO deliverlist(time, location, status,delivernum,carrier,dupnum) VALUES (?)';
+    const progressQuery = 'INSERT INTO deliverlist (time, location, status, delivernum, carrier, dupnum) VALUES ? ON DUPLICATE KEY UPDATE dupnum = VALUES(dupnum)';
     const progressValues = progresses.map((progress) => [
       progress.time,
       progress.location.name,
       progress.status.text,
-      data.carrier.id,
+      data.number,
       data.carrier.name,
-      progress.time+data.carrier.id
+      progress.time + data.number,
     ]);
-    progressValues.forEach((item) => {
-      db.query(progressQuery, [item], (progressError) => {
-        if (progressError) {
-          console.error('Error updating progress:', progressError);
+
+    db.query(progressQuery, [progressValues], (progressError, progressResults) => {
+      if (progressError) {
+        console.error('Error updating progress:', progressError);
+        return;
+      }
+
+      console.log('Progress updated:', progressResults);
+
+      // ALTER TABLE 문은 한 번만 실행하도록 처리
+      db.query('ALTER TABLE deliverlist ADD UNIQUE INDEX (dupnum)', (alterError, alterResults) => {
+        if (alterError) {
+          console.error('Error executing ALTER TABLE:', alterError);
           return;
         }
-      });
-     db.query('ALTER TABLE deliverlist ADD UNIQUE INDEX (dupnum)')
-    });
 
-   
+        console.log('ALTER TABLE executed:', alterResults);
+      });
+    });
   } catch (error) {
     console.error('Error:', error);
   }
 }
 
-// JSON 데이터를 가져와서 데이터베이스를 업데이트하는 함수
-async function updateDataFromAPI() {
+// API를 통해 데이터 가져오고 데이터베이스 업데이트
+async function updateDataFromAPI(productnum,carrier, number) {
   try {
-    // API로부터 데이터 가져오기
+    const apiEndpoint = `https://apis.tracker.delivery/carriers/${carrier}/tracks/${number}`;
+
     const response = await axios.get(apiEndpoint);
-    const jsonData = response.data;
+    const data = response.data;
 
-    // JSON 데이터 파싱
-    const data = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
-    console.log(data, 'data');
-    console.log(jsonData, 'jsonData');
+    console.log('Data fetched:', data);
 
-    // 이미 연결된 상태인지 확인
-    if (db.state === 'disconnected') {
-      // 연결이 해제된 경우에만 새로운 연결 생성
-      db.connect((err) => {
-        if (err) {
-          console.error('Error connecting to database:', err);
-          return;
-        }
-
-        console.log('Connected to database');
-
-        // 데이터베이스 업데이트 로직 추가...
-        updateJsonData(data);
-
-        // 연결 해제
-        db.end();
-      });
-    } else {
-      console.log('Already connected to database');
-
-      updateJsonData(data);
-    }
+    // 데이터베이스 연결
+    db.connect((err) => {
+      if (err) {
+        console.error('Error connecting to database:', err);
+        return;
+      }
+      console.log('Connected to database');
+      updateJsonData(data,productnum);
+    });
   } catch (error) {
     console.error('Error fetching data from API:', error);
   }
 }
 
-// 데이터베이스 업데이트를 실행하는 API 엔드포인트
-app.get('/api/updateData', (req, res) => {
-  updateDataFromAPI();
-  res.sendStatus(200);
-});
+// 객체 배열의 값들을 순회하면서 API 호출 및 데이터베이스 업데이트
+async function processDeliverData() {
+  db.query('SELECT buylist.dNum, buylist.carrier, buylist.productnum  FROM buylist' ,(error, results, fields) => {
+    results.forEach(function (item, index, arr) {
+     
+      deliverData.push({
+        productnum : arr[index].productnum, 
+        carrier : arr[index].carrier, 
+        number : arr[index].dNum, 
+        
+      })
+  })
+  
+  for (const data of deliverData) {
+     updateDataFromAPI(data.productnum, data.carrier, data.number);
+  }
 
-// 서버 시작 시 초기 데이터베이스 업데이트 실행
-updateDataFromAPI();
+  // 연결 종료
+  db.end();
+})}
+
+// deliverData 처리
+processDeliverData();
+
 // 회원가입 _ 중복확인
 app.get('/api/useridcheck', (req, res) => {
   db.query('SELECT * FROM userinfo WHERE userId = ?', [req.query.userId], (error, results, fields) => {
