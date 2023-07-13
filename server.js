@@ -25,19 +25,11 @@ app.use(cors(corsOptions));
 //---(1) express 서버 셋팅 및 subscribe. database save---------------------// 
 app.listen(port, () => {
     console.log(`listening on ${port}`);
-  //   app.get(`https://apis.tracker.delivery/carriers/${carriers}/tracks/${num}`, (req, res) => {
-  // db.query('INSERT IGNORE INTO deliverlist(time,location,status,delivernum,carrier) VALUES (?,?,?,? , ? ) ON DUPLICATE KEY UPDATE time = ? , location =? , status =? , delivernum = ? , carrier = ? ', [], (error, results, fields) => {
-  //     })
-  //   })
-
 });
-let deliverData = []
-async function updateJsonData(data,productnum) {
+async function updateJsonData(data, productnum) {
   try {
-
     // 데이터베이스 업데이트
     const progresses = data.progresses;
-    const progressQuery = 'INSERT INTO deliverlist (time, location, status, delivernum, carrier, dupnum) VALUES ? ON DUPLICATE KEY UPDATE dupnum = VALUES(dupnum)';
     const progressValues = progresses.map((progress) => [
       progress.time,
       progress.location.name,
@@ -47,22 +39,30 @@ async function updateJsonData(data,productnum) {
       progress.time + data.number,
     ]);
 
-    db.query(progressQuery, [progressValues], (progressError, progressResults) => {
-      if (progressError) {
-        console.error('Error updating progress:', progressError);
-        return;
-      }
+    const progressQuery = 'INSERT INTO deliverlist (time, location, status, delivernum, carrier, dupnum) VALUES ? ON DUPLICATE KEY UPDATE dupnum = VALUES(dupnum)';
 
-      console.log('Progress updated:', progressResults);
-
-      // ALTER TABLE 문은 한 번만 실행하도록 처리
-      db.query('ALTER TABLE deliverlist ADD UNIQUE INDEX (dupnum)', (alterError, alterResults) => {
-        if (alterError) {
-          console.error('Error executing ALTER TABLE:', alterError);
-          return;
+    await new Promise((resolve, reject) => {
+      db.query(progressQuery, [progressValues], (progressError, progressResults) => {
+        if (progressError) {
+          reject(progressError);
+        } else {
+          console.log('Progress updated:', progressResults);
+          resolve();
         }
+      });
+    });
 
-        console.log('ALTER TABLE executed:', alterResults);
+    // ALTER TABLE 문은 한 번만 실행하도록 처리
+    const alterQuery = 'ALTER TABLE deliverlist ADD UNIQUE INDEX (dupnum)';
+
+    await new Promise((resolve, reject) => {
+      db.query(alterQuery, (alterError, alterResults) => {
+        if (alterError) {
+          reject(alterError);
+        } else {
+          console.log('ALTER TABLE executed:', alterResults);
+          resolve();
+        }
       });
     });
   } catch (error) {
@@ -71,13 +71,11 @@ async function updateJsonData(data,productnum) {
 }
 
 // API를 통해 데이터 가져오고 데이터베이스 업데이트
-async function updateDataFromAPI(productnum,carrier, number) {
+async function updateDataFromAPI(productnum, carrier, number) {
   try {
     const apiEndpoint = `https://apis.tracker.delivery/carriers/${carrier}/tracks/${number}`;
-
     const response = await axios.get(apiEndpoint);
     const data = response.data;
-
     console.log('Data fetched:', data);
 
     // 데이터베이스 연결
@@ -87,35 +85,35 @@ async function updateDataFromAPI(productnum,carrier, number) {
         return;
       }
       console.log('Connected to database');
-      updateJsonData(data,productnum);
+      updateJsonData(data, productnum);
     });
   } catch (error) {
     console.error('Error fetching data from API:', error);
   }
 }
 
-// 객체 배열의 값들을 순회하면서 API 호출 및 데이터베이스 업데이트
+// deliverData 처리
 async function processDeliverData() {
-  db.query('SELECT buylist.dNum, buylist.carrier, buylist.productnum  FROM buylist' ,(error, results, fields) => {
-    results.forEach(function (item, index, arr) {
-     
-      deliverData.push({
-        productnum : arr[index].productnum, 
-        carrier : arr[index].carrier, 
-        number : arr[index].dNum, 
-        
-      })
-  })
-  
-  for (const data of deliverData) {
-     updateDataFromAPI(data.productnum, data.carrier, data.number);
-  }
+  try {
+    const query = 'SELECT buylist.dNum, buylist.carrier, buylist.productnum FROM buylist';
+    const [rows] = await db.promise().execute(query);
 
-})}
+    const deliverData = rows.map((row) => ({
+      productnum: row.productnum,
+      carrier: row.carrier,
+      number: row.dNum,
+    }));
+
+    for (const data of deliverData) {
+      await updateDataFromAPI(data.productnum, data.carrier, data.number);
+    }
+  } catch (error) {
+    console.error('Error processing deliverData:', error);
+  }
+}
 
 // deliverData 처리
 processDeliverData();
-
 // 회원가입 _ 중복확인
 app.get('/api/useridcheck', (req, res) => {
   db.query('SELECT * FROM userinfo WHERE userId = ?', [req.query.userId], (error, results, fields) => {
