@@ -96,11 +96,12 @@ async function updateDataFromAPI(productnum, carrier, number) {
 
 // deliverData 처리
 async function processDeliverData() {
-  let deliverData=[]
+
   try {
-    const query = 'SELECT buylist.dNum, buylist.carrier, buylist.productnum FROM buylist';
+ 
     db.query('SELECT * FROM buylist' ,(error, results, fields) => {
       console.log(results,'results')
+      let deliverData=[]
       results.forEach(function (item, index, arr) {
         deliverData.push({
           productnum : arr[index].productnum, 
@@ -109,8 +110,11 @@ async function processDeliverData() {
           
         })
     })
+    
+  console.log(deliverData,'???d안??')
   })
-  console.log(deliverData,'?????')
+  
+  console.log(deliverData,'?????밖')
   if(deliverData[0]){ 
     for (const data of deliverData) {
       console.log(deliverData,'deliverdata')
