@@ -26,7 +26,8 @@ app.use(cors(corsOptions));
 app.listen(port, () => {
     console.log(`listening on ${port}`);
 });
-let deliverData=[]
+let deliverData = [];
+
 async function updateJsonData(data, productnum) {
   try {
     // 데이터베이스 업데이트
@@ -40,7 +41,8 @@ async function updateJsonData(data, productnum) {
       progress.time + data.number,
     ]);
 
-    const progressQuery = 'INSERT INTO deliverlist (time, location, status, delivernum, carrier, dupnum) VALUES ? ON DUPLICATE KEY UPDATE dupnum = VALUES(dupnum)';
+    const progressQuery =
+      'INSERT INTO deliverlist (time, location, status, delivernum, carrier, dupnum) VALUES ? ON DUPLICATE KEY UPDATE dupnum = VALUES(dupnum)';
 
     await new Promise((resolve, reject) => {
       db.query(progressQuery, [progressValues], (progressError, progressResults) => {
@@ -97,20 +99,17 @@ async function updateDataFromAPI(productnum, carrier, number) {
 async function processDeliverData() {
   try {
     const query = 'SELECT buylist.dNum, buylist.carrier, buylist.productnum FROM buylist';
-    db.query('SELECT * FROM buylist' ,(error, results, fields) => {
-      console.log(results,'results')
-      results.forEach(function (item, index, arr) {
-        deliverData.push({
-          productnum : arr[index].productnum, 
-          carrier : arr[index].carrier, 
-          number : arr[index].dNum, 
-          
-        })
-    })
-  })
-   
+
+    const [rows] = await db.promise().execute(query);
+
+    deliverData = rows.map((row) => ({
+      productnum: row.productnum,
+      carrier: row.carrier,
+      number: row.dNum,
+    }));
+
     for (const data of deliverData) {
-      console.log(deliverData,'deliverdata')
+      console.log(deliverData, 'deliverdata');
       await updateDataFromAPI(data.productnum, data.carrier, data.number);
     }
   } catch (error) {
