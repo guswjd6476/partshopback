@@ -26,6 +26,7 @@ app.use(cors(corsOptions));
 app.listen(port, () => {
     console.log(`listening on ${port}`);
 });
+let deliverData=[]
 async function updateJsonData(data, productnum) {
   try {
     // 데이터베이스 업데이트
@@ -96,14 +97,18 @@ async function updateDataFromAPI(productnum, carrier, number) {
 async function processDeliverData() {
   try {
     const query = 'SELECT buylist.dNum, buylist.carrier, buylist.productnum FROM buylist';
-    const [rows] = await db.promise().execute(query);
-
-    const deliverData = rows.map((row) => ({
-      productnum: row.productnum,
-      carrier: row.carrier,
-      number: row.dNum,
-    }));
-
+    db.query('SELECT * FROM buylist' ,(error, results, fields) => {
+      results.forEach(function (item, index, arr) {
+       
+        deliverData.push({
+          productnum : arr[index].productnum, 
+          carrier : arr[index].carrier, 
+          number : arr[index].dNum, 
+          
+        })
+    })
+  })
+   
     for (const data of deliverData) {
       await updateDataFromAPI(data.productnum, data.carrier, data.number);
     }
