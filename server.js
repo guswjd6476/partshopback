@@ -94,36 +94,37 @@ async function updateDataFromAPI(productnum, carrier, number) {
   }
 }
 
-// deliverData 처리
-async function processDeliverData() {
+let deliverData = [];
 
+async function processDeliverData() {
   try {
- 
-    db.query('SELECT * FROM buylist' ,(error, results, fields) => {
-      console.log(results,'results')
-      let deliverData=[]
-      results.forEach(function (item, index, arr) {
-        deliverData.push({
-          productnum : arr[index].productnum, 
-          carrier : arr[index].carrier, 
-          number : arr[index].dNum, 
-          
-        })
-    })
-    
-  console.log(deliverData,'???d안??')
-  })
-  
-  console.log(deliverData,'?????밖')
-  if(deliverData[0]){ 
-    for (const data of deliverData) {
-      console.log(deliverData,'deliverdata')
-      await updateDataFromAPI(data.productnum, data.carrier, data.number);
+    const results = await new Promise((resolve, reject) => {
+      db.query('SELECT * FROM buylist', (error, results, fields) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(results);
+        }
+      });
+    });
+
+    console.log(results, 'results');
+    results.forEach(function (item, index, arr) {
+      deliverData.push({
+        productnum: arr[index].productnum,
+        carrier: arr[index].carrier,
+        number: arr[index].dNum,
+      });
+    });
+
+    console.log(deliverData, '?????밖');
+    if (deliverData.length > 0) {
+      for (const data of deliverData) {
+        console.log(deliverData, 'deliverdata');
+        await updateDataFromAPI(data.productnum, data.carrier, data.number);
+      }
     }
-  }
-  }
-  
-  catch (error) {
+  } catch (error) {
     console.error('Error processing deliverData:', error);
   }
 }
