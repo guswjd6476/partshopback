@@ -55,18 +55,18 @@ async function updateJsonData(data, productnum) {
     });
 
     // ALTER TABLE 문은 한 번만 실행하도록 처리
-    const alterQuery = 'ALTER TABLE deliverlist ADD UNIQUE INDEX (dupnum)';
+    // const alterQuery = 'ALTER TABLE deliverlist ADD UNIQUE INDEX (dupnum)';
 
-    await new Promise((resolve, reject) => {
-      db.query(alterQuery, (alterError, alterResults) => {
-        if (alterError) {
-          reject(alterError);
-        } else {
-          console.log('ALTER TABLE executed:', alterResults);
-          resolve();
-        }
-      });
-    });
+    // await new Promise((resolve, reject) => {
+    //   db.query(alterQuery, (alterError, alterResults) => {
+    //     if (alterError) {
+    //       reject(alterError);
+    //     } else {
+    //       console.log('ALTER TABLE executed:', alterResults);
+    //       resolve();
+    //     }
+    //   });
+    // });
   } catch (error) {
     console.error('Error:', error);
   }
